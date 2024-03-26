@@ -4,4 +4,4 @@ Integration for Zammad Helpdesk
 
 #### License
 
-mit
+mit# erpnext_zammad
