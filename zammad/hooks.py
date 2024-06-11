@@ -4,7 +4,16 @@ app_publisher = "PC-Giga"
 app_description = "Integration for Zammad Helpdesk"
 app_email = "info@pc-giga.de"
 app_license = "mit"
-# required_apps = []
+required_apps = ["frappe", "erpnext"]
+
+doc_events = {
+    "Zammad Ticket": {
+        "onload": "zammad.zammad.doctype.zammad_ticket.zammad_ticket_dashboard.get_data"
+    }
+}
+
+
+#doctype_js = {"doctype" : "public/js/zammad_import.js"}
 
 # Includes in <head>
 # ------------------
