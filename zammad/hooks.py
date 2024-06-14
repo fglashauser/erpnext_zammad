@@ -6,11 +6,19 @@ app_email = "info@pc-giga.de"
 app_license = "mit"
 required_apps = ["frappe", "erpnext"]
 
-doc_events = {
-    "Zammad Ticket": {
-        "onload": "zammad.zammad.doctype.zammad_ticket.zammad_ticket_dashboard.get_data"
+fixtures = [
+    {
+        "dt": "Custom Field",
+        "filters": [
+            {
+                "module": "Zammad"
+            }
+        ]
     }
-}
+]
+
+# doc_events = {
+# }
 
 
 #doctype_js = {"doctype" : "public/js/zammad_import.js"}

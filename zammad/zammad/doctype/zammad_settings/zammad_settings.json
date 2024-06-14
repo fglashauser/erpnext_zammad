@@ -1,0 +1,118 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-06-13 10:40:22.359982",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "api_url",
+  "api_token",
+  "company",
+  "default_employee",
+  "default_activity_type",
+  "default_contact",
+  "import_tag",
+  "only_closed_tickets",
+  "activity_type_map",
+  "blacklist_tags"
+ ],
+ "fields": [
+  {
+   "description": "The API-Url of the Zammad-Instance you want to connect.",
+   "fieldname": "api_url",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "API-Url",
+   "reqd": 1
+  },
+  {
+   "fieldname": "api_token",
+   "fieldtype": "Password",
+   "in_list_view": 1,
+   "label": "API-Token",
+   "reqd": 1
+  },
+  {
+   "description": "Is used on imports if no mapped Employee was found",
+   "fieldname": "default_employee",
+   "fieldtype": "Link",
+   "label": "Default Employee",
+   "options": "Employee",
+   "reqd": 1
+  },
+  {
+   "description": "Is used on imports if no mapped Activity type was found",
+   "fieldname": "default_activity_type",
+   "fieldtype": "Link",
+   "label": "Default Activity type",
+   "options": "Activity Type",
+   "reqd": 1
+  },
+  {
+   "description": "Put tags in here which should not be imported (Note: You don't have to add the \"Import Tag\", it is taken care of automatically)",
+   "fieldname": "blacklist_tags",
+   "fieldtype": "Table",
+   "label": "Import Blacklist by Tags",
+   "options": "Zammad Tag"
+  },
+  {
+   "description": "This tag is being set in Zammad when a ticket is imported successfully. The tagged tickets aren't imported next time.",
+   "fieldname": "import_tag",
+   "fieldtype": "Data",
+   "label": "Import Tag",
+   "reqd": 1
+  },
+  {
+   "description": "Contact which should be set if no matching contact (by E-Mail) could be found",
+   "fieldname": "default_contact",
+   "fieldtype": "Link",
+   "label": "Default Contact / Customer",
+   "options": "Contact",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "description": "Imports only tickets with status \"Closed\". Else all tickets will be imported.",
+   "fieldname": "only_closed_tickets",
+   "fieldtype": "Check",
+   "label": "Only closed tickets"
+  },
+  {
+   "fieldname": "activity_type_map",
+   "fieldtype": "Table",
+   "label": "Activity Type Mapping",
+   "options": "Zammad Activity-Type Map"
+  },
+  {
+   "description": "The company to which the timesheets should belong",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-06-14 11:29:58.525412",
+ "modified_by": "Administrator",
+ "module": "Zammad",
+ "name": "Zammad Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -343,7 +343,18 @@ class Ticket(Resource):
         :param id: Ticket id
         """
         response = self._connection.session.get(
-            f"{self._connection.url}tags?object=Ticket&object_id={id}"
+            f"{self._connection.url}tags?object=Ticket&o_id={id}"
+        )
+        return self._raise_or_return_json(response)
+
+    def add_tag(self, id, tag):
+        """Add a tag to the ticket
+
+        :param id: Ticket id
+        :param tag: Tag name
+        """
+        response = self._connection.session.post(
+            f"{self._connection.url}tags/add", json={"object": "Ticket", "o_id": id, "item": tag}
         )
         return self._raise_or_return_json(response)
 

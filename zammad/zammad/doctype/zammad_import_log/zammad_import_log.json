@@ -1,0 +1,65 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-06-13 13:02:40.016419",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "import_datetime",
+  "ticket_number",
+  "ticket_title",
+  "timesheet"
+ ],
+ "fields": [
+  {
+   "fieldname": "import_datetime",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Import datetime",
+   "reqd": 1
+  },
+  {
+   "fieldname": "timesheet",
+   "fieldtype": "Link",
+   "label": "Imported Timesheet",
+   "options": "Timesheet",
+   "reqd": 1
+  },
+  {
+   "fieldname": "ticket_number",
+   "fieldtype": "Data",
+   "label": "Zammad Ticket-Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "ticket_title",
+   "fieldtype": "Data",
+   "label": "Zammad Ticket Title",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-06-14 12:20:49.620349",
+ "modified_by": "Administrator",
+ "module": "Zammad",
+ "name": "Zammad Import Log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

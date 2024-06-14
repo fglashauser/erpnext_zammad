@@ -1,19 +1,18 @@
-from ..data import ZammadConnector
-from ..zammad_settings import ZammadSettings
+from . import Service
 import frappe
 
-class CustomerService:
-    """Service for customer related operations in Zammad.
-    """
-    def __init__(self, zammad_connector : ZammadConnector = None):
-        """Initializes CustomerService.
-        If zammad_connector is not provided, it will create a new one with default settings.
+class Customer(Service):
+    # """Service for customer related operations in Zammad.
+    # """
+    # def __init__(self, zammad_connector : ZammadConnector = None):
+    #     """Initializes CustomerService.
+    #     If zammad_connector is not provided, it will create a new one with default settings.
         
-        Args:
-            zammad_connector (ZammadConnector, optional): ZammadConnector instance. Defaults to None.
-        """
-        self.settings = ZammadSettings()
-        self.zammad = zammad_connector if zammad_connector else ZammadConnector()
+    #     Args:
+    #         zammad_connector (ZammadConnector, optional): ZammadConnector instance. Defaults to None.
+    #     """
+    #     self.settings = ZammadSettings()
+    #     self.zammad = zammad_connector if zammad_connector else ZammadConnector()
 
     
     def get_contact_by_email(self, email: str):

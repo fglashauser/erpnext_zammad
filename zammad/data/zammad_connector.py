@@ -1,6 +1,5 @@
 import frappe
 from .zammad_api import ZammadAPI
-from ..zammad_settings import ZammadSettings
 
 class ZammadConnector:
     def __init__(self, api_url : str = None, auth_token : str = None):
@@ -15,9 +14,9 @@ class ZammadConnector:
         if api_url and auth_token:
             self._api = ZammadAPI(url=api_url, http_token=auth_token)
         else:
-            settings = ZammadSettings()
+            settings = frappe.get_single("Zammad Settings")
             self._api = ZammadAPI(url=settings.api_url,
-                                 http_token=settings.auth_token)
+                                 http_token=settings.get_password("api_token"))
         
     @property
     def api(self):

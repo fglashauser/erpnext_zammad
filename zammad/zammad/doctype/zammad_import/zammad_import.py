@@ -1,79 +1,60 @@
-# zammad/zammad/doctype/zammad_import/zammad_import.py
+# Copyright (c) 2024, PC-Giga and contributors
+# For license information, please see license.txt
+
 import frappe
-from frappe.utils import getdate, formatdate, format_time, now
-from zammad.zammad.services import TicketService, TimeEntryService
-
-@frappe.whitelist()
-def fetch_tickets(docname, ticket_state : str = 'All', only_billable : bool = False):
-    """Fetches tickets from Zammad by the given filters.
-    Fetches only tickets that don't have the import tag set.
-
-    Args:
-        docname (str): Name of the document to which the tickets should be added.
-        ticket_state (str, optional): Ticket state filter. Defaults to 'All'.
-            Possible options: All, Open, Closed
-        only_billable (bool, optional): If true, only billable tickets will be fetched. Defaults to False.
-    """
-    ticket_service = TicketService()
-    tickets = ticket_service.fetch_tickets(ticket_state, only_billable)
-    
-    # Add fetched tickets to the child table of the given document
-    add_tickets_to_child_table(docname, tickets)
-
-    return {'message': f'{len(tickets)} tickets fetched and added.'}
+from frappe.model.document import Document
+from ....services import zammad
+from ....services import erpnext
 
 
-@frappe.whitelist()
-def add_tickets_to_child_table(docname, tickets):
-    """Adds the tickets to the child table of the given document.
+class ZammadImport(Document):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.ticket_service = zammad.Ticket()
+		self.timesheet_service = erpnext.Timesheet()
+		self.import_log_service = erpnext.ImportLog()
 
-    Args:
-        docname (str): Name of the document to which the tickets should be added.
-        tickets (list of dict): A list of tickets to add to the child table.
-    """
-    time_entry_service = TimeEntryService()
-    doc = frappe.get_doc("Zammad Import", docname)
-    
-    # Remove all existing child table entries
-    doc.set('zammad_tickets', [])
-    
-    for ticket in tickets:
-        # Create a new child table entry
-        child_entry = frappe.get_doc({
-            'doctype'           : 'Zammad Ticket',
-            'parenttype'        : 'Zammad Import',
-            'parentfield'       : 'zammad_tickets',
-            'zammad_ticket_id'  : ticket.get('id', None),
-            'customer_contact'  : ticket.get('customer_contact', None),
-            'number'            : ticket.get('number', None),
-            'title'             : ticket.get('title', None),
-            'employee'          : ticket.get('employee', None),
-            'created_at'        : ticket.get('created_at', None),
-            'closed_at'         : ticket.get('close_at', None),
-            'description'       : ticket.get('description', None)
-        })
-        # Add the child table entry to the document
-        doc.append('zammad_tickets', child_entry)
-    
-    # Save the document
-    doc.save()
+	@frappe.whitelist()
+	def start_import(self):
+		"""Starts the import of Zammad data to ERPNext."""
+		frappe.enqueue_doc(
+			"Zammad Import",
+			self.name,
+			"start_import_job",
+			queue="long",
+			timeout=5000
+		)
 
-    # Insert Time Entries for every ticket
-    for ticket in doc.zammad_tickets:
-        # Fetch time entries for the ticket
-        time_entries = time_entry_service.get_time_entries(ticket.zammad_ticket_id)
+	def start_import_job(self):
+		"""Imports Zammad data to ERPNext."""
+		
+		# Alle Tickets via API holen und nach Tag & Status filtern
+		tickets = self._get_tickets()
 
-        # Add time entries
-        for time_entry in time_entries:
-            # Create a new time entry document
-            doc_time_entry = frappe.get_doc({
-                'doctype'            : 'Zammad Time Entry',
-                'ticket'            : ticket.get('name', None),
-                'employee'          : time_entry.get('employee', None),
-                'activity_type'     : time_entry.get('activity_type', None),
-                'created_at'        : time_entry.get('created_at', None),
-                'duration'          : time_entry.get('duration', None),
-                'description'       : time_entry.get('description', None)
-            })
-            # Create a new document for the time entry
-            doc_time_entry.save()
+		# Timesheets anlegen, Tag setzen & Log erstellen
+		for ticket in tickets:
+			timesheet = self._create_timesheet(ticket)
+			self._set_import_tag(ticket)
+			self._create_log(ticket, timesheet)
+			print(f"Ticket {ticket.get('number', '???')} imported.")
+
+		# DB-Änderungen schreiben
+		frappe.db.commit()
+
+	def _get_tickets(self) -> list:
+		"""Returns all tickets from Zammad."""
+		tickets = self.ticket_service.get_tickets()
+		return tickets
+
+	def _create_timesheet(self, ticket: dict) -> Document:
+		"""Creates a timesheet for the ticket."""
+		timesheet = self.timesheet_service.create_by_zammad_ticket(ticket)
+		return timesheet.insert()
+
+	def _set_import_tag(self, ticket: dict) -> None:
+		"""Sets the import tag for the ticket."""
+		self.ticket_service.set_import_tag(ticket.get('id', None))
+
+	def _create_log(self, ticket: dict, timesheet: Document) -> Document:
+		"""Creates a log for the imported tickets."""
+		return self.import_log_service.log_import(ticket, timesheet)
